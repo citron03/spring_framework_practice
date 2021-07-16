@@ -45,8 +45,10 @@ public class BoardServiceImpl implements BoardService {
 
         Function<Object[], BoardDTO> fn = (en -> entityToDTO((Board)en[0], (Member)en[1], (Long)en[2]));
 
+
         //Page<Object[]> result = repository.getBoardWithReplyCount(
         //        pageRequestDTO.getPageable(Sort.by("bno").descending()));
+
 
         Page<Object[]> result = repository.searchPage(
                 pageRequestDTO.getType(),
@@ -63,9 +65,9 @@ public class BoardServiceImpl implements BoardService {
 
         Object result = repository.getBoardByBno(bno);
 
-        Object[] arr = (Object[]) result;
+        Object[] arr = (Object[])result;
 
-        return entityToDTO((Board) arr[0], (Member) arr[1], (Long) arr[2]);
+        return entityToDTO((Board)arr[0], (Member)arr[1], (Long)arr[2]);
 
     }
 

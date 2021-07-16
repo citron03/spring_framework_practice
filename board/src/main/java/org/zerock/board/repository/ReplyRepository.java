@@ -3,7 +3,10 @@ package org.zerock.board.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.zerock.board.entity.Board;
 import org.zerock.board.entity.Reply;
+
+import java.util.List;
 
 public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
@@ -11,5 +14,8 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
     @Modifying
     @Query("delete from Reply r where r.board.bno =:bno")
     void deleteByBno(Long bno);
+
+    // Board 객체를 파라미터로 받고 모든 댓글을 순번대로 가져온다.
+    List<Reply> getRepliesByBoardOrderByRno(Board board);
     
 }

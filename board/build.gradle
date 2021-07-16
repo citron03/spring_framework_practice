@@ -42,8 +42,10 @@ dependencies {
 	annotationProcessor 'com.querydsl:querydsl-apt:4.4.0:jpa' // QueryDSL must have (exactly this way, including :jpa)
 	annotationProcessor 'javax.annotation:javax.annotation-api' // QueryDSL must have
 
+
 }
 
 test {
 	useJUnitPlatform()
 }
+

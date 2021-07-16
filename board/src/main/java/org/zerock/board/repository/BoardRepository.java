@@ -21,10 +21,17 @@ public interface BoardRepository extends JpaRepository<Board, Long>, SearchBoard
     @Query("SELECT b, r FROM Board b LEFT JOIN Reply r ON r.board = b WHERE b.bno = :bno")
     List<Object[]> getBoardWithReply(@Param("bno") Long bno);
 
-    @Query(value = "SELECT b, w, count(r)" + " FROM Board b " + " LEFT JOIN b.writer w " + " LEFT JOIN Reply r ON r.board = b "
-    + " GROUP BY b ", countQuery = "SELECT count(b) FROM Board b")
+
+    @Query(value = "SELECT b, w, count(r)" +
+            " FROM Board b " +
+            " LEFT JOIN b.writer w " +
+            " LEFT JOIN Reply r ON r.board = b " +
+            " GROUP BY b ",
+            countQuery = "SELECT count(b) FROM Board b")
     Page<Object[]> getBoardWithReplyCount(Pageable pageable);
     // 목록 화면에 필요한 데이터
+
+
 
     // 조회화면에서는 보드와 맴버를 주로 이용하고 몇개의 댓글이 있는지 보여준다.
     // 댓글은 Ajax를 이용하여 필요한 순간에 동적으로 불러온다.
