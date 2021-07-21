@@ -4,6 +4,8 @@ package org.zerock.mreview.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
+import org.springframework.transaction.annotation.Transactional;
 import org.zerock.mreview.entity.Member;
 import org.zerock.mreview.entity.Movie;
 import org.zerock.mreview.entity.Review;
@@ -16,6 +18,9 @@ public class ReviewRepositoryTests {
 
     @Autowired
     private ReviewRepository reviewRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Test
     public void insertMovieReviews(){
@@ -66,6 +71,30 @@ public class ReviewRepositoryTests {
 
         });
 
+
+    }
+
+    @Commit
+    @Transactional
+    @Test
+    public void testDeleteMember(){
+
+        Long mid = 1L; //Member의 mid
+
+        Member member = Member.builder()
+                .mid(mid)
+                .build();
+
+        // 처음 에러가 나는 코드
+        //memberRepository.deleteById(mid);
+        //reviewRepository.deleteByMember(member);
+
+        // 순서가 중요하다.
+        // 하지만 review 테이블에서 3번 반복실행 후 member 테이블을 삭제하는 비효율 발생
+        reviewRepository.deleteByMember(member);
+        memberRepository.deleteById(mid);
+
+        // 에러를 방지하기 위해서는 FK를 가지는 Review쪽을 먼저 삭제해야 하고 트랜젝션 관련 처리를 해야한다.
 
     }
 
