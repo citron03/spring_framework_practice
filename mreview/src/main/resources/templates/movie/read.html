@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:replace="~{/layout/basic :: setContent(~{this::content} )}">
+
+
+  <th:block th:replace="~{/layout/basic :: setContent(~{this::content} )}">
+
+    <th:block th:fragment="content">
+
+      <h1 class="mt-4">Movie Read Page</h1>
+
+      <div class="form-group">
+        <label >Title</label>
+        <input type="text" class="form-control" name="title" th:value="${dto.title}" readonly>
+      </div>
+
+      <div class="form-group">
+        <label >Review Count </label>
+        <input type="text" class="form-control" name="title" th:value="${dto.reviewCnt}" readonly>
+      </div>
+
+      <div class="form-group">
+        <label >Avg </label>
+        <input type="text" class="form-control" name="title" th:value="${dto.avg}" readonly>
+      </div>
+
+      <style>
+            .uploadResult {
+                width: 100%;
+                background-color: gray;
+                margin-top: 10px;
+            }
+
+            .uploadResult ul {
+                display: flex;
+                flex-flow: row;
+                justify-content: center;
+                align-items: center;
+                vertical-align: top;
+                overflow: auto;
+            }
+
+            .uploadResult ul li {
+                list-style: none;
+                padding: 10px;
+                margin-left: 2em;
+            }
+
+            .uploadResult ul li img {
+                width: 100px;
+            }
+        </style>
+
+      <div class="uploadResult">
+        <ul >
+          <li th:each="movieImage: ${dto.imageDTOList}" th:data-file="${movieImage.getThumbnailURL()}">
+            <img  th:if="${movieImage.path != null}" th:src="|/display?fileName=${movieImage.getThumbnailURL()}|">
+          </li>
+        </ul>
+      </div>
+
+      <button type="button" class="btn btn-primary">
+        Review Count <span class="badge badge-light">[[${dto.reviewCnt}]]</span>
+      </button>
+
+      <script>
+
+        $(document).ready(function(e){
+
+
+        });
+
+      </script>
+
+    </th:block>
+
+  </th:block>
+
+</th:block>
