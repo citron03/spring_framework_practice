@@ -25,6 +25,244 @@
         <input type="text" class="form-control" name="title" th:value="${dto.avg}" readonly>
       </div>
 
+
+
+      <div class="reviewModal modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Movie Review</h5>
+
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label >Reviewer ID</label>
+                <input type="text" class="form-control" name="mid" >
+              </div>
+              <div class="form-group">
+                <label >Grade <span class="grade"></span></label>
+                <div class='starrr'></div>
+              </div>
+              <div class="form-group">
+                <label >Review Text</label>
+                <input type="text" class="form-control" name="text" placeholder="Good Movie!" >
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary reviewSaveBtn">Save changes</button>
+              <button type="button" class="btn btn-warning modifyBtn">Modify </button>
+              <button type="button" class="btn btn-danger removeBtn">Remove </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="imageModal modal " tabindex="-2" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Picture</h5>
+
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script th:src="@{/starrr.js}"></script>
+      <link th:href="@{/css/starrr.css}" rel="stylesheet">
+      <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+
+      <script>
+
+        $(document).ready(function(e){
+
+            var grade = 0;
+            var mno = [[${dto.mno}]];
+
+            $('.starrr').starrr({
+                rating: grade,
+                change: function(e, value){
+
+                    if (value) {
+                        console.log(value);
+                        grade = value;
+                    }
+
+                }
+            });
+
+            // 미리 보기용
+            // $(".reviewModal").modal("show");
+
+            var reviewModal = $(".reviewModal");
+            var inputMid = $('input[name="mid"]');
+            var inputText = $('input[name="text"]');
+
+            $(".addReviewBtn").click(function(){
+
+            inputMid.val("");
+            inputText.val("");
+
+            $(".removeBtn, .modifyBtn").hide();
+            $(".reviewSaveBtn").show();
+
+            reviewModal.modal('show');
+
+            });
+
+
+            $('.reviewSaveBtn').click(function() {
+
+                // 리뷰 저장
+                // 입력할 때 리뷰어 아이디는 mno, 즉 숫자이다. (데이터 베이스에 존재하는 맴버)
+
+                var data = { mno:mno, grade:grade, text:inputText.val(), mid: inputMid.val() };
+
+                console.log(data);
+
+                $.ajax({
+                    url:'/reviews/'+mno,
+                    type:"POST",
+                    data:JSON.stringify(data),
+                    contentType:"application/json; charset=utf-8",
+                    dataType:"text",
+                    success: function(result){
+
+                        console.log("result: " + result);
+
+                        self.location.reload();
+
+                    }
+                })
+                reviewModal.modal('hide');
+
+            });
+
+
+            // 페이지가 열리면 바로 리뷰 데이터들을 가져와서 사용한다.
+            // 리뷰를 read 페이지에서 모두 보여준다.
+            function getMovieReviews() {
+
+                function formatTime(str){
+                    var date = new Date(str);
+
+                    return date.getFullYear() + '/' +
+                        (date.getMonth() + 1) + '/' +
+                        date.getDate() + ' ' +
+                        date.getHours() + ':' +
+                        date.getMinutes();
+                }
+
+                $.getJSON("/reviews/"+ mno +"/all", function(arr){
+                    var str ="";
+
+                    $.each(arr, function(idx, review){
+                        console.log(review);
+
+                        str += '    <div class="card-body" data-reviewnum='+review.reviewnum+' data-mid='+review.mid+'>';
+                        str += '    <h5 class="card-title">'+review.text+' <span>'+ review.grade+'</span></h5>';
+                        str += '    <h6 class="card-subtitle mb-2 text-muted">'+review.nickname+'</h6>';
+                        str += '    <p class="card-text">'+ formatTime(review.regDate) +'</p>';
+                        str += '    </div>';
+                    });
+
+                    $(".reviewList").html(str);
+                });
+            }
+            // 페이지가 열리면 무조건적으로 호출한다.
+            getMovieReviews();
+
+
+            // 리뷰를 수정한다.
+            var reviewnum;
+
+            // 리뷰 클릭시 모달창이 나타남.
+            $(".reviewList").on("click", ".card-body", function() {
+
+                $(".reviewSaveBtn").hide();
+                $(".removeBtn , .modifyBtn").show();
+
+                var targetReview = $(this);
+
+                reviewnum = targetReview.data("reviewnum");
+                console.log("reviewnum: "+ reviewnum);
+                inputMid.val(targetReview.data("mid"));
+                inputText.val(targetReview.find('.card-title').clone().children().remove().end().text());
+
+                var grade = targetReview.find('.card-title span').html();
+                $(".starrr a:nth-child("+grade+")").trigger('click');
+
+                $('.reviewModal').modal('show');
+            });
+
+            // 리뷰 수정
+            $(".modifyBtn").on("click", function(){
+
+                var data = {reviewnum: reviewnum, mno:mno, grade:grade, text:inputText.val(), mid: inputMid.val() };
+
+                console.log(data);
+
+                $.ajax({
+                    url:'/reviews/'+mno +"/"+ reviewnum ,
+                    type:"PUT",
+                    data:JSON.stringify(data),
+                    contentType:"application/json; charset=utf-8",
+                    dataType:"text",
+                    success: function(result){
+
+                        console.log("result: " + result);
+
+                        self.location.reload();
+
+                    }
+                })
+                reviewModal.modal('hide');
+            });
+
+            // 리뷰 삭제
+            $(".removeBtn").on("click", function(){
+
+                var data = {reviewnum: reviewnum};
+
+                console.log(data);
+
+                $.ajax({
+                    url:'/reviews/'+mno +"/"+ reviewnum ,
+                    type:"DELETE",
+                    contentType:"application/json; charset=utf-8",
+                    dataType:"text",
+                    success: function(result){
+
+                        console.log("result: " + result);
+
+                        self.location.reload();
+
+                    }
+                })
+                reviewModal.modal('hide');
+            });
+
+
+        });
+
+      </script>
+
+
+
       <style>
             .uploadResult {
                 width: 100%;
@@ -63,6 +301,16 @@
       <button type="button" class="btn btn-primary">
         Review Count <span class="badge badge-light">[[${dto.reviewCnt}]]</span>
       </button>
+
+      <button type="button" class="btn btn-info addReviewBtn">
+        Review Register
+      </button>
+
+      <div class="list-group reviewList">
+
+
+
+      </div>
 
       <script>
 
