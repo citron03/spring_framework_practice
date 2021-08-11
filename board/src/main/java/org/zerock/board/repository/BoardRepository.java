@@ -23,11 +23,11 @@ public interface BoardRepository extends JpaRepository<Board, Long>, SearchBoard
 
 
     @Query(value = "SELECT b, w, count(r)" +
-            " FROM Board b " +
-            " LEFT JOIN b.writer w " +
-            " LEFT JOIN Reply r ON r.board = b " +
+            " FROM Board b" +
+            " LEFT JOIN b.writer w" +
+            " LEFT JOIN Reply r ON r.board = b" +
             " GROUP BY b ",
-            countQuery = "SELECT count(b) FROM Board b")
+            countQuery = " SELECT count(b) FROM Board b")
     Page<Object[]> getBoardWithReplyCount(Pageable pageable);
     // 목록 화면에 필요한 데이터
 
@@ -37,7 +37,7 @@ public interface BoardRepository extends JpaRepository<Board, Long>, SearchBoard
     // 댓글은 Ajax를 이용하여 필요한 순간에 동적으로 불러온다.
     @Query("SELECT b, w, count(r) " +
             " FROM Board b LEFT JOIN b.writer w " +
-            " LEFT OUTER JOIN Reply r ON r.board = b" +
+            " LEFT OUTER JOIN Reply r ON r.board = b " +
             " WHERE b.bno = :bno ")
     Object getBoardByBno(@Param("bno") Long bno);
 
