@@ -5,6 +5,6 @@
 
 * springboot
 * thymeleaf
-* JPA
+* spring data JPA
 * querydsl
 * spring security
