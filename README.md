@@ -7,3 +7,4 @@
 * thymeleaf
 * JPA
 * querydsl
+* spring security
