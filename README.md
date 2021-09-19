@@ -8,3 +8,4 @@
 * spring data JPA
 * querydsl
 * spring security
+* lombok
