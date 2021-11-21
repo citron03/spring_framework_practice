@@ -73,20 +73,6 @@ public class MovieRepositoryTests {
 
     }
 
-    // 이미지 테스트
-    @Test
-    public void testImageListPage(){
-
-        PageRequest pageRequest = PageRequest.of(0,10, Sort.by(Sort.Direction.DESC, "mno"));
-
-        Page<Object[]> result = imageRepository.getListPage(pageRequest);
-
-        for(Object[] objects : result.getContent()) {
-            System.out.println(Arrays.toString(objects));
-        }
-
-    }
-
     @Test
     public void testGetMovieWithAll(){
 
